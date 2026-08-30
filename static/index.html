@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
+    <title>Password Forge</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Password Forge</h1>
+            <p class="subtitle">Генератор и анализатор надёжных паролей</p>
+        </header>
+
+        <section class="card generator-section">
+            <h2>Генератор паролей</h2>
+
+            <div class="form-group">
+                <label for="method-select">Метод генерации:</label>
+                <select id="method-select">
+                    <option value="classic">Классический</option>
+                    <option value="passphrase">Парольная фраза</option>
+                    <option value="pronounceable">Произносимый</option>
+                    <option value="pattern">По шаблону</option>
+                </select>
+            </div>
+            <div id="classic-options" class="options-group">
+                <div class="form-group">
+                    <label for="length-slider">Длина: <span id="length-value">16</span></label>
+                    <input type="range" id="length-slider" min="4" max="128" value="16">
+                </div>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="use-upper" checked> Заглавные (A-Z)</label>
+                    <label><input type="checkbox" id="use-lower" checked> Строчные (a-z)</label>
+                    <label><input type="checkbox" id="use-digits" checked> Цифры (0-9)</label>
+                    <label><input type="checkbox" id="use-symbols" checked> Спецсимволы (!@#$...)</label>
+                </div>
+                <div class="form-group">
+                    <label for="exclude-chars">Исключить символы:</label>
+                    <input type="text" id="exclude-chars" placeholder="Например: 0O1lI">
+                </div>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="min-of-each" checked> Минимум по одному из каждого набора</label>
+                </div>
+            </div>
+            <div id="passphrase-options" class="options-group" style="display: none;">
+                <div class="form-group">
+                    <label for="word-count-slider">Количество слов: <span id="word-count-value">5</span></label>
+                    <input type="range" id="word-count-slider" min="3" max="10" value="5">
+                </div>
+                <div class="form-group">
+                    <label for="separator">Разделитель:</label>
+                    <input type="text" id="separator" value="-" maxlength="3">
+                </div>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="capitalize" checked> Заглавные буквы</label>
+                    <label><input type="checkbox" id="add-number" checked> Добавить число</label>
+                    <label><input type="checkbox" id="add-symbol" checked> Добавить спецсимвол</label>
+                </div>
+            </div>
+            <div id="pronounceable-options" class="options-group" style="display: none;">
+                <div class="form-group">
+                    <label for="pronounceable-length-slider">Длина: <span id="pronounceable-length-value">12</span></label>
+                    <input type="range" id="pronounceable-length-slider" min="8" max="32" value="12">
+                </div>
+            </div>
+            <div id="pattern-options" class="options-group" style="display: none;">
+                <div class="form-group">
+                    <label for="pattern-template">Шаблон:</label>
+                    <input type="text" id="pattern-template" placeholder="W-W-DD-S" value="W-W-DD-S">
+                    <small class="hint">W=слово, D=цифра, S=спецсимвол, L=строчная, U=заглавная, остальные символы как есть</small>
+                </div>
+            </div>
+
+            <div class="password-display">
+                <div class="password-text" id="generated-password"></div>
+                <div class="password-actions">
+                    <button id="copy-btn" class="btn btn-primary">📋 Копировать</button>
+                    <button id="refresh-btn" class="btn btn-secondary">🔄 Обновить</button>
+                </div>
+                <div id="copy-timer" class="copy-timer" style="display: none;">
+                    Буфер очистится через <span id="timer-seconds">30</span> сек...
+                </div>
+            </div>
+        </section>
+        <section class="card analyzer-section">
+            <h2>Анализатор надёжности</h2>
+
+            <div class="form-group">
+                <label for="analyze-input">Проверить свой пароль:</label>
+                <div class="input-with-toggle">
+                    <input type="password" id="analyze-input" placeholder="Введите пароль для анализа">
+                    <button id="toggle-visibility" class="btn-icon">👁</button>
+                </div>
+            </div>
+
+            <div id="analysis-results" style="display: none;">
+                <div class="strength-meter">
+                    <div class="strength-bar" id="strength-bar"></div>
+                </div>
+                <div class="strength-label" id="strength-label">Оценка</div>
+
+                <div class="entropy-display">
+                    <span class="entropy-value" id="entropy-value">0</span>
+                    <span class="entropy-label">бит энтропии</span>
+                </div>
+
+                <div id="warnings" class="feedback-list"></div>
+                <div id="suggestions" class="feedback-list"></div>
+
+                <details class="details-accordion">
+                    <summary>Технические детали</summary>
+                    <div id="technical-details"></div>
+                </details>
+            </div>
+        </section>
+        <section class="card cracker-section">
+            <h2>Время взлома</h2>
+            <div id="crack-times" class="crack-times-grid"></div>
+        </section>
+
+        <footer>
+            <p>Все вычисления выполняются локально. Пароли никуда не отправляются.</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
