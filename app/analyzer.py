@@ -75,8 +75,6 @@ def detect_repeats(password: str, char_entropy: float) -> float:
     pwd_lower = password.lower()
     n = len(pwd_lower)
     covered = [False] * n
-
-    # 1. Одиночные идущие подряд символы (например: 'aaaa', '1111')
     i = 0
     while i < n:
         char = pwd_lower[i]
@@ -89,7 +87,6 @@ def detect_repeats(password: str, char_entropy: float) -> float:
                 covered[k] = True
         i += count
 
-    # 2. Повторяющиеся соседние блоки от крупных к мелким (например: 'abcabc', 'abab')
     for block_len in range(n // 2, 1, -1):
         i = 0
         while i <= n - block_len * 2:
@@ -110,7 +107,6 @@ def detect_repeats(password: str, char_entropy: float) -> float:
             else:
                 i += 1
 
-    # 3. Многократное использование одного и того же разделителя (например, '-' 4 раза во фразе)
     non_alnum_counts = Counter(
         pwd_lower[idx] for idx in range(n)
         if not covered[idx] and not pwd_lower[idx].isalnum()
@@ -214,7 +210,6 @@ def detect_common_passwords(password: str) -> Tuple[float, bool, int]:
     if pwd_lower in COMMON_PASSWORDS:
         return 100.0, True, 1
 
-    # Проверка базовой части без цифр/спецсимволов на концах
     stripped = pwd_lower.strip(string.digits + string.punctuation + " ")
     if stripped and stripped in COMMON_PASSWORDS:
         return 60.0, True, 100
@@ -245,7 +240,6 @@ def detect_dictionary_words(password: str, char_entropy: float) -> Tuple[float, 
     covered = [False] * n
     matched_lengths = []
 
-    # Ищем самые длинные непересекающиеся словарные слова
     for length in range(min(20, n), 3, -1):
         for start in range(n - length + 1):
             if any(covered[start:start + length]):
@@ -329,7 +323,6 @@ def analyze_password(password: str) -> Dict:
             }
         }
 
-    # Ограничиваем анализируемую строку до 256 символов для мгновенного отклика
     analyzed_pwd = password[:256]
     length = len(password)
 
@@ -349,7 +342,6 @@ def analyze_password(password: str) -> Dict:
         common_penalty + dictionary_penalty + leet_penalty
     )
 
-    # Ограничение сверху 512 битами предотвращает OverflowError при возведении 2 ** effective_entropy
     effective_entropy = min(512.0, max(0.0, entropy_bits - total_penalty))
     if is_common and common_position == 1:
         effective_entropy = 0.0
